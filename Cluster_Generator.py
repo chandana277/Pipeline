@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
-
-
-
-# In[2]:
-
 
 ################Imports#################
 
@@ -23,17 +15,12 @@ import itertools
 
 import sys
 
-# In[5]:
-
-
 ### Specify the path of the RGI files and extract the .txt files from the folder
 #path = os.path.join(os.path.expanduser('~'),'Fin_RGI')
 
 path=sys.argv[1]
 #print (path)
 readfiles=glob.glob(os.path.join(path,"*.txt"))
-# In[4]:
-
 
 ####Read each rgi file(.txt) using pandas and store them in a dataframe####
 dataframelist=[]
@@ -60,25 +47,16 @@ for i in range(len(filenames)):
     datadict[b]=pd.DataFrame(a)  
 
 
-# In[6]:
-
-
-#### function to manipulate contig to compare whether the RGI and GBK genes belong to same contig#####
 #### function to manipulate contig to compare whether the RGI and GBK genes belong to same contig#####
 def parti(c):
   head,sep,tail=c.partition("_")
   return (head)
-
-
-
 
 def locus_generator(c,genome_name):
     a,b=c.split("_")
     tag=genome_name+"_"+b
     #print(tag)
     return tag
-
-
 
 for k,v in datadict.items():
     newcon=[]
@@ -88,8 +66,6 @@ for k,v in datadict.items():
         Locus_Temp.append(locus_generator(i,k))
     v['req_cont']=newcon    ###adding a new column "req_cont" into dataframe
     v['Locus_Tag']=Locus_Temp
-# In[7]:
-
 
 
 ####function to extract the required data from gbk files(entire genomes:) using biopython####    
@@ -147,17 +123,12 @@ def extract(infile):
   return salmonella_gene_frame,unique
 
 
-# In[8]:
-
-
 ####specifying the location/path names og gbk files and loading them####
 #filepath=os.path.join(os.path.expanduser('~'),'Fin_gbk')
 filepath=sys.argv[2]
 #gbkfiles=glob.glob(os.path.join(filepath,"*.gbk"))
 gbkfiles=glob.glob(os.path.join(filepath,"*.gbk"))
 
-
-# In[9]:
 
 
 gbk_names=[]
@@ -180,9 +151,6 @@ for i in gbk_names:
     
 
 
-# In[10]:
-
-
 ### extract the data from gbk files and store in a dict of dataframes####
 gbkdict={}
 uniquedict={}
@@ -192,16 +160,12 @@ for i in range(len(gbk_names)):
     gbkdict[a],uniquedict[b]=extract(gbkfiles[i])
 
 
-# In[11]:
-
 
 #### manipulate the locus tag and protein sequence ###
 for j,i in gbkdict.items():
     i['Locus_Tag']=i['Locus_Tag'].apply(lambda i:str(i).replace("[","").replace("]","").replace("'",""))
     i['ProteinSequence']=i['ProteinSequence'].str.strip('[]')
 
-
-# In[12]:
 
 
 ####function to create groups based on contigs ###
@@ -221,11 +185,6 @@ for i in range(len(gbk_names)):
     for j,k in gbkdict.items():
         datasetdict[j]=make_groups(k)
 
-
-# In[13]:
-
-
-
 #### find the unique drugclasses of all the genomes and store it in uniquedrugdict####
 uniquedrugdict={}
 
@@ -236,11 +195,6 @@ for j,k in datadict.items():
                 uniquedrugclasses.append(k["Drug Class"][l])
     uniquedrugdict[j]=uniquedrugclasses
         
-
-
-# In[14]:
-
-
 
 ###### having the minimum has static value extract the genome that has minimum number of drug classes has key##
 min=100
@@ -255,9 +209,6 @@ min_drug_key=minarray[0]
 #print(min_drug_key)
 
 
-# In[15]:
-
-
 listofdrugnames_modified=[]
 for i,j in uniquedrugdict.items():
     if i==min_drug_key:
@@ -267,16 +218,6 @@ for i,j in uniquedrugdict.items():
             else:
                 listofdrugnames_modified.append(k.split("; ")[0].split(" ")[0])
                 
-
-
-# In[16]:
-
-
-
-
-
-# In[17]:
-
 
 
 #creating separate dictionary for all the unique drugclasses of the genome "key"
@@ -290,15 +231,12 @@ def createeachdict_drug(drugindex):
    
 
 
-# In[18]:
-
 
 main_dictionary={}
 for i in range(len(listofdrugnames_modified)):
     main_dictionary[listofdrugnames_modified[i]]=createeachdict_drug(uniquedrugdict[min_drug_key][i])
 
 
-# In[19]:
 
 
 Dict_multigene_instances={}
@@ -306,7 +244,7 @@ for i,j in main_dictionary.items():
     Dict_multigene_instances[i]={k: v for k, v in j.items() if len(v)>1}
 
 
-# In[20]:
+
 
 
 Dict_singlegene_instances={}
@@ -320,8 +258,6 @@ for i,j in main_dictionary.items():
     Dict_singlegene_instances[i]=temp_dict
 
 
-# In[21]:
-
 
 emptykeyslist=[]
 for i,j in Dict_singlegene_instances.items():
@@ -329,9 +265,6 @@ for i,j in Dict_singlegene_instances.items():
         emptykeyslist.append(i)
 for i in emptykeyslist:
     del Dict_singlegene_instances[i]
-
-
-# In[22]:
 
 
 emptykeyslist=[]
@@ -392,27 +325,6 @@ for i in range(len(Required_drug_dictkeys)):
     Dict_each_drug_len_greater2[Required_drug_dictkeys[i]]=createARO_drug(Required_drug_names[i])
 
 
-# In[29]:
-
-
-# for i,j in Dict_each_drug_len_greater2.items():
-#     for a,b in j.items():
-#         empty_list=[]
-#         if b.empty:
-#             empty_list.append(a) 
-#     for l in empty_list:
-#         print(j[l])
-#         del j[l]
-#     Dict_each_drug_len_greater2[i]=j
-            
-
-
-# In[30]:
-
-
-
-# In[31]:
-
 
 ### Finding neighbours(5 upstream and 5 dowmstream genes for each card gene)
 def find_neighbor(rec,uname,data,number_of_genes,drug,genome):
@@ -472,40 +384,14 @@ def find_neighbor(rec,uname,data,number_of_genes,drug,genome):
             
   if(len(m)!=0):
     if(len(n)<g ):
-        
-        #print("contig ends downward------- : "+str(drug)+str("at position -------")+ str(len(n)))
-#         if number_of_genes==10:
-#             contigend_visualization(e,"downward",genome)
-        
-#         print("RGI gene-start: "+str(rec['Start'][j]))
-#         print("RGI gene-end: "+ str(rec['Stop'][j]))
-#         print("RGI gene-name: "+ str(rec['Best_Hit_ARO'][j]))
-#         print("RGI gene-orientation: "+ str(rec['Orientation'][j]))
-
-        
-        #contigend_visualization(plotindex=1)
+      
         neighbor_genes=[]
-        
-    #print(n)]
-        #print(k)
-        #print(m)
-        #print(rec['Start'][j],rec['Stop'][j],rec['Best_Hit_ARO'][j])
-    # print("contig ends at :"+str(m['Locus_Tag'].iloc[0]))
+    
     elif (len(m)<g):
-        #print("contig ends upward-------: "+str(drug)+str("at position ----") + str(len(m)))
-#         if number_of_genes==10:
-#             contigend_visualization(e,"upward",genome)
-#         print("RGI gene-start: "+str(rec['Start'][j]))
-#         print("RGI gene-end: "+ str(rec['Stop'][j]))
-#         print("RGI gene-name: "+ str(rec['Best_Hit_ARO'][j]))
-#         print("RGI gene-orientation: "+ str(rec['Orientation'][j]))
-        
+                
         neighbor_genes=[]          
 
   return neighbor_genes
-
-
-# In[32]:
 
 
 multipleinstance_neighboringdict_combined_range_10={}
@@ -520,24 +406,12 @@ for i,j in Dict_each_drug_len_greater2.items():
             
 
 
-# In[33]:
-
-
-
-
-# In[34]:
-
-
 emptykeyslist=[]
 for i,j in multipleinstance_neighboringdict_combined_range_10.items():
     if len(j)==0:
         emptykeyslist.append(i)
 for i in emptykeyslist:
     del multipleinstance_neighboringdict_combined_range_10[i]
-
-
-# In[35]:
-
 
 multipleinstance_neighboringdict_combined_range_14={}
 
@@ -561,8 +435,6 @@ for i in emptykeyslist:
     del multipleinstance_neighboringdict_combined_range_14[i]
 
 
-# In[37]:
-
 
 singleinstance_neighboringdict_combined_range10={}
 for i,j in Dict_singlegene_instances.items():
@@ -574,24 +446,12 @@ for i,j in Dict_singlegene_instances.items():
     singleinstance_neighboringdict_combined_range10[i]=Dict_neighboring_genes_range10
 
 
-# In[38]:
-
-
 emptykeyslist=[]
 for i,j in singleinstance_neighboringdict_combined_range10.items():
     if len(j)==0:
         emptykeyslist.append(i)
 for i in emptykeyslist:
     del singleinstance_neighboringdict_combined_range10[i]
-
-
-# In[ ]:
-
-
-
-
-
-# In[39]:
 
 
 singleinstance_neighboringdict_combined_range14={}
@@ -605,9 +465,6 @@ for i,j in Dict_singlegene_instances.items():
     singleinstance_neighboringdict_combined_range14[i]=Dict_neighboring_genes_range14
 
 
-# In[40]:
-
-
 emptykeyslist=[]
 for i,j in singleinstance_neighboringdict_combined_range14.items():
     if len(j)==0:
@@ -616,10 +473,6 @@ for i in emptykeyslist:
     del singleinstance_neighboringdict_combined_range14[i]
 
 
-# In[41]:
-
-
-### function to get separate dicts of locus tags,protein sequences and gene names inorder to compare and write to a fasta file####
 ### function to get separate dicts of locus tags,protein sequences and gene names inorder to compare and write to a fasta file####
 def getrequiredgenes(frame,number_of_genes,drug):
     temp_locus_array=[]
@@ -684,14 +537,6 @@ for i,j in multipleinstance_neighboringdict_combined_range_10.items():
     Drug_multiple_instance_range_10_genename_dict10[i]=genename_dict_10
 
 
-# In[43]:
-
-
-
-
-
-# In[44]:
-
 
 Drug_multiple_instance_range_14_locus_dict14={}
 Drug_multiple_instance_range_14_protein_dict14={}
@@ -717,9 +562,6 @@ for i,j in multipleinstance_neighboringdict_combined_range_14.items():
     
 
 
-# In[45]:
-
-
 Drug_singleinstance_range_10_locus_dict10={}
 Drug_singleinstance_range_10_protein_dict10={}
 Drug_singleinstance_range_10_genename_dict10={}
@@ -734,9 +576,6 @@ for i,j in singleinstance_neighboringdict_combined_range10.items():
     Drug_singleinstance_range_10_locus_dict10[i]=locustags_dict_10
     Drug_singleinstance_range_10_protein_dict10[i]=protein_dict_10
     Drug_singleinstance_range_10_genename_dict10[i]=genename_dict_10
-
-
-# In[46]:
 
 
 Drug_singleinstance_range_14_locus_dict14={}
@@ -759,20 +598,6 @@ for i,j in singleinstance_neighboringdict_combined_range14.items():
 
 
 
-
-
-
-
-
-
-# In[47]:
-
-
-
-
-# In[48]:
-
-
 # get_ipython().system('pip install matplotlib')
 # get_ipython().system('pip install scipy')
 # get_ipython().system('pip install plotly')
@@ -788,8 +613,6 @@ import plotly.figure_factory as ff
 import scipy.spatial as scs
 from scipy.spatial.distance import pdist,squareform
 
-
-# In[49]:
 
 
 #### path to read the result text file into a dataframe
@@ -815,10 +638,6 @@ for i in range(len(single_instance_blastfilename)):
     a=single_instance_blastdataframelist[i]
     b=single_instance_blastfilename[i]
     single_instance_blastdatadict[b]=pd.DataFrame(a)
-    
-
-
-# In[50]:
 
 
 ### path to read the result text file into a dataframe
@@ -847,9 +666,6 @@ for i in range(len(Multiple_instance_blastfilename)):
     
 
 
-# In[51]:
-
-
 single_instance_drugclass_genomedict={}
 for k,l in Drug_singleinstance_range_10_locus_dict10.items():
     genomesdict={}
@@ -859,14 +675,6 @@ for k,l in Drug_singleinstance_range_10_locus_dict10.items():
     #print(genomesdict)
     
     single_instance_drugclass_genomedict[k]=genomesdict
-
-
-# In[52]:
-
-
-
-
-# In[53]:
 
 
 multiple_instance_drugclass_genomedict={}
@@ -879,14 +687,6 @@ for k,l in Drug_multiple_instance_range_14_locus_dict14.items():
     
     multiple_instance_drugclass_genomedict[k]=genomesdict
 
-
-# In[54]:
-
-
-
-
-
-# In[55]:
 
 
 ### function in order to remove extra genes and have only desired 10 or 20 genes per genome for comparison
@@ -918,7 +718,6 @@ for i,j in single_instance_drugclass_genomedict.items():
     drugclass_single_tempdict[i]=tempdict
 
 
-# In[57]:
 
 
 drugclass_multiple_tempdict={}
@@ -928,15 +727,6 @@ for i,j in multiple_instance_drugclass_genomedict.items():
     for m in j.keys():
             tempdict[m]=removefilter(j[m],Drug_multiple_instance_range_10_locus_dict10[i][m])
     drugclass_multiple_tempdict[i]=tempdict
-
-
-# In[ ]:
-
-
-
-
-
-# In[58]:
 
 
 drugclass_single_answerdict={}
@@ -964,13 +754,7 @@ for l,k in drugclass_single_tempdict.items():
     drugclass_single_answerdict[l]=answer
 
 
-# In[59]:
 
-
-
-
-
-# In[60]:
 
 
 ### a dataframe with query_id and sub_id as separate genomes with their total bitscore
@@ -1034,17 +818,6 @@ for l,k in drugclass_multiple_tempdict.items():
     drugclass_multiple_answerdict[l]=answer
 
 
-# In[72]:
-
-
-
-
-
-# In[64]:
-
-
-
-
 
 ### a dataframe with query_id and sub_id as separate genomes with their total bitscore
 multiple_instance_matrixframe={}
@@ -1058,9 +831,6 @@ for i,j in drugclass_multiple_answerdict.items():
     
 
 
-# In[78]:
-
-
 emptykeyarray=[]
 for i,j in multiple_instance_matrixframe.items():
     if len(j)==1:
@@ -1069,7 +839,7 @@ for i in emptykeyarray:
     del multiple_instance_matrixframe[i]
 
 
-# In[79]:
+
 import os.path
 
 save_path = 'Multiple_instance_clusters/'
@@ -1088,9 +858,6 @@ for i,j in multiple_instance_matrixframe.items():
    figure.write_image(savename)
 
 
-
-
-
 uniquekeysforeachdict={}
 for i,j in drugclass_single_tempdict.items():
     unique_query_id=[]
@@ -1098,8 +865,6 @@ for i,j in drugclass_single_tempdict.items():
         if k not in unique_query_id:
             unique_query_id.append(k)
     uniquekeysforeachdict[i]=unique_query_id
-
-
 
 
 save_path="Phylogeny_fasta_files/"
@@ -1137,8 +902,7 @@ for i,j in uniquekeysforeachdict.items():
         k.reset_index(drop=True, inplace=True)
        
         
-        count+=1
-        
+        count+=1       
        
 
         filef=open(savename,"w")
@@ -1149,25 +913,5 @@ for i,j in uniquekeysforeachdict.items():
             filef.write("\n")
             filef.writelines(Locus_to_Protein_SingleInst_Dict[i][genome][k["sub_id"][l]])
             filef.write("\n")
-        filef.close()
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+        filef.close()  
 
